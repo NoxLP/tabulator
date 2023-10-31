@@ -402,7 +402,7 @@ class Tabulator {
 	}
 	
 	//update table data
-	updateData(data){
+	updateData(data, force = true){
 		var responses = 0;
 		
 		this.initGuard();
@@ -421,7 +421,7 @@ class Tabulator {
 					if(row){
 						responses++;
 						
-						row.updateData(item)
+						row.updateData(item, force)
 							.then(()=>{
 								responses--;
 							

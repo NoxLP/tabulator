@@ -62,8 +62,8 @@ export default class RowComponent {
 		this._row.moveToRow(to, after);
 	}
 
-	update(data){
-		return this._row.updateData(data);
+	update(data, force = true){
+		return this._row.updateData(data, force);
 	}
 
 	normalizeHeight(){

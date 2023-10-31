@@ -3018,8 +3018,8 @@ class RowComponent {
 		this._row.moveToRow(to, after);
 	}
 
-	update(data){
-		return this._row.updateData(data);
+	update(data, force = true){
+		return this._row.updateData(data, force);
 	}
 
 	normalizeHeight(){
@@ -3280,7 +3280,7 @@ class Row extends CoreFeature{
 	}
 	
 	//update the rows data
-	updateData(updatedData){
+	updateData(updatedData, force){
 		var visible = this.element && Helpers.elVisible(this.element),
 		tempData = {},
 		newRowData;
@@ -3317,7 +3317,7 @@ class Row extends CoreFeature{
 					
 					if(cell){
 						let value = column.getFieldValue(newRowData);
-						if(cell.getValue() !== value){
+						if(force || cell.getValue() !== value){
 							cell.setValueProcessData(value);
 							
 							if(visible){
@@ -25849,7 +25849,7 @@ class Tabulator {
 	}
 	
 	//update table data
-	updateData(data){
+	updateData(data, force = true){
 		var responses = 0;
 		
 		this.initGuard();
@@ -25868,7 +25868,7 @@ class Tabulator {
 					if(row){
 						responses++;
 						
-						row.updateData(item)
+						row.updateData(item, force)
 							.then(()=>{
 								responses--;
 							
