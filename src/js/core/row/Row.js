@@ -233,7 +233,7 @@ export default class Row extends CoreFeature{
 	}
 	
 	//update the rows data
-	updateData(updatedData, force){
+	updateData(updatedData, forceRowUpdate, forcedColumnUpdateName){
 		var visible = this.element && Helpers.elVisible(this.element),
 		tempData = {},
 		newRowData;
@@ -270,7 +270,8 @@ export default class Row extends CoreFeature{
 					
 					if(cell){
 						let value = column.getFieldValue(newRowData);
-						if(force || cell.getValue() !== value){
+						const forceColumnUpdate = (Array.isArray(forcedColumnUpdateName) && forcedColumnUpdateName.includes(column.field)) || forcedColumnUpdateName === column.field;
+						if(forceRowUpdate || forceColumnUpdate || cell.getValue() !== value){
 							cell.setValueProcessData(value);
 							
 							if(visible){

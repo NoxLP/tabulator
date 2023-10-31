@@ -402,10 +402,14 @@ class Tabulator {
 	}
 	
 	//update table data
-	updateData(data, force = true){
+	updateData(data, forceRowUpdate, forcedColumnUpdateName){
 		var responses = 0;
 		
 		this.initGuard();
+
+		if((!Array.isArray(forcedColumnUpdateName) && typeof forcedColumnUpdateName != 'string') || forcedColumnUpdateName.length == 0){
+			forcedColumnUpdateName = undefined;
+		}
 		
 		return new Promise((resolve, reject) => {
 			this.dataLoader.blockActiveLoad();
@@ -421,7 +425,7 @@ class Tabulator {
 					if(row){
 						responses++;
 						
-						row.updateData(item, force)
+						row.updateData(item, forceRowUpdate, forcedColumnUpdateName)
 							.then(()=>{
 								responses--;
 							

@@ -62,8 +62,11 @@ export default class RowComponent {
 		this._row.moveToRow(to, after);
 	}
 
-	update(data, force = true){
-		return this._row.updateData(data, force);
+	update(data, forceRowUpdate, forcedColumnUpdateName){
+		if((!Array.isArray(forcedColumnUpdateName) && typeof forcedColumnUpdateName != 'string') || forcedColumnUpdateName.length == 0){
+			forcedColumnUpdateName = undefined;
+		}
+		return this._row.updateData(data, forceRowUpdate, forcedColumnUpdateName);
 	}
 
 	normalizeHeight(){
