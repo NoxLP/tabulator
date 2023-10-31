@@ -3401,8 +3401,11 @@
 			this._row.moveToRow(to, after);
 		}
 
-		update(data){
-			return this._row.updateData(data);
+		update(data, forceRowUpdate, forcedColumnUpdateName){
+			if((!Array.isArray(forcedColumnUpdateName) && typeof forcedColumnUpdateName != 'string') || forcedColumnUpdateName.length == 0){
+				forcedColumnUpdateName = undefined;
+			}
+			return this._row.updateData(data, forceRowUpdate, forcedColumnUpdateName);
 		}
 
 		normalizeHeight(){
@@ -3663,7 +3666,7 @@
 		}
 		
 		//update the rows data
-		updateData(updatedData){
+		updateData(updatedData, forceRowUpdate, forcedColumnUpdateName){
 			var visible = this.element && Helpers.elVisible(this.element),
 			tempData = {},
 			newRowData;
@@ -3700,7 +3703,8 @@
 						
 						if(cell){
 							let value = column.getFieldValue(newRowData);
-							if(cell.getValue() !== value){
+							const forceColumnUpdate = (Array.isArray(forcedColumnUpdateName) && forcedColumnUpdateName.includes(column.field)) || forcedColumnUpdateName === column.field;
+							if(forceRowUpdate || forceColumnUpdate || cell.getValue() !== value){
 								cell.setValueProcessData(value);
 								
 								if(visible){
@@ -8259,10 +8263,14 @@
 		}
 		
 		//update table data
-		updateData(data){
+		updateData(data, forceRowUpdate, forcedColumnUpdateName){
 			var responses = 0;
 			
 			this.initGuard();
+
+			if((!Array.isArray(forcedColumnUpdateName) && typeof forcedColumnUpdateName != 'string') || forcedColumnUpdateName.length == 0){
+				forcedColumnUpdateName = undefined;
+			}
 			
 			return new Promise((resolve, reject) => {
 				this.dataLoader.blockActiveLoad();
@@ -8278,7 +8286,7 @@
 						if(row){
 							responses++;
 							
-							row.updateData(item)
+							row.updateData(item, forceRowUpdate, forcedColumnUpdateName)
 								.then(()=>{
 									responses--;
 								

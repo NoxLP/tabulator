@@ -3018,8 +3018,11 @@ class RowComponent {
 		this._row.moveToRow(to, after);
 	}
 
-	update(data, force = true){
-		return this._row.updateData(data, force);
+	update(data, forceRowUpdate, forcedColumnUpdateName){
+		if((!Array.isArray(forcedColumnUpdateName) && typeof forcedColumnUpdateName != 'string') || forcedColumnUpdateName.length == 0){
+			forcedColumnUpdateName = undefined;
+		}
+		return this._row.updateData(data, forceRowUpdate, forcedColumnUpdateName);
 	}
 
 	normalizeHeight(){
@@ -3280,7 +3283,7 @@ class Row extends CoreFeature{
 	}
 	
 	//update the rows data
-	updateData(updatedData, force){
+	updateData(updatedData, forceRowUpdate, forcedColumnUpdateName){
 		var visible = this.element && Helpers.elVisible(this.element),
 		tempData = {},
 		newRowData;
@@ -3317,7 +3320,8 @@ class Row extends CoreFeature{
 					
 					if(cell){
 						let value = column.getFieldValue(newRowData);
-						if(force || cell.getValue() !== value){
+						const forceColumnUpdate = (Array.isArray(forcedColumnUpdateName) && forcedColumnUpdateName.includes(column.field)) || forcedColumnUpdateName === column.field;
+						if(forceRowUpdate || forceColumnUpdate || cell.getValue() !== value){
 							cell.setValueProcessData(value);
 							
 							if(visible){
@@ -25849,10 +25853,14 @@ class Tabulator {
 	}
 	
 	//update table data
-	updateData(data, force = true){
+	updateData(data, forceRowUpdate, forcedColumnUpdateName){
 		var responses = 0;
 		
 		this.initGuard();
+
+		if((!Array.isArray(forcedColumnUpdateName) && typeof forcedColumnUpdateName != 'string') || forcedColumnUpdateName.length == 0){
+			forcedColumnUpdateName = undefined;
+		}
 		
 		return new Promise((resolve, reject) => {
 			this.dataLoader.blockActiveLoad();
@@ -25868,7 +25876,7 @@ class Tabulator {
 					if(row){
 						responses++;
 						
-						row.updateData(item, force)
+						row.updateData(item, forceRowUpdate, forcedColumnUpdateName)
 							.then(()=>{
 								responses--;
 							
