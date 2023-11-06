@@ -18663,7 +18663,7 @@ class SelectRow extends Module{
 	//toggle row selection
 	toggleRow(row){
 		if(this.checkRowSelectability(row)){
-			if(row.modules.select && row.modules.select.selected){
+			if (row.modules.select && row.modules.select.selected && !this.table.options.clickNoDeselect) {
 				this._deselectRow(row);
 			}else {
 				this._selectRow(row);

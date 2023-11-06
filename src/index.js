@@ -28,7 +28,6 @@ console.log("DATA: ", data);
 
 const columnFormatter = (cell, formatterParams, onRendered) => {
 	const cellValue = cell.getValue();
-	console.log("here");
 	const html = cellValue.milestones.map((m) => {
 		return `<div style="border: solid black 1px">${m.firstM}-${m.tasks.map(
 			(t) => {
@@ -51,6 +50,8 @@ columns[0].formatter = columnFormatter;
 console.log(columns);
 
 window.table = new Tabulator("#forceUpdateTableTest", {
+	selectable: 1,
+	clickNoDeselectRow: true,
 	height: 800,
 	data,
 	columns,
