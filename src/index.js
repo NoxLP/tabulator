@@ -51,7 +51,7 @@ console.log(columns);
 
 window.table = new Tabulator("#forceUpdateTableTest", {
 	selectable: 1,
-	clickNoDeselect: true,
+	clickNoDeselectRow: true,
 	height: 800,
 	data,
 	columns,
