@@ -270,7 +270,20 @@ export default class Row extends CoreFeature{
 					
 					if(cell){
 						let value = column.getFieldValue(newRowData);
-						const forceColumnUpdate = (Array.isArray(forcedColumnUpdateName) && forcedColumnUpdateName.includes(column.field)) || forcedColumnUpdateName === column.field;
+						const columnField = column.getField();
+						const isLinkedColumn = columnField.includes('$');
+						const fieldsSplit = columnField.split('$');
+						const forceColumnUpdate = (
+							Array.isArray(forcedColumnUpdateName) &&
+							(
+								forcedColumnUpdateName.includes(columnField) ||
+								(isLinkedColumn && forcedColumnUpdateName.some((colName) => fieldsSplit.some(
+									(f) => f == colName)
+								))
+							)
+						) ||
+							(isLinkedColumn && columnField.includes(forcedColumnUpdateName)) ||
+							forcedColumnUpdateName === columnField;
 						if(forceRowUpdate || forceColumnUpdate || cell.getValue() !== value){
 							cell.setValueProcessData(value);
 							
