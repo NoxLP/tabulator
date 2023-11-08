@@ -185,6 +185,21 @@ class Helpers{
 
 		return clone;
 	}
+
+	static elOuterHeight(el){
+		const computedStyle = getComputedStyle(el);
+		const padding =
+			parseFloat(computedStyle.getPropertyValue("padding-top")) +
+			parseFloat(computedStyle.getPropertyValue("padding-bottom"));
+		const margin =
+			parseFloat(computedStyle.getPropertyValue("margin-top")) +
+			parseFloat(computedStyle.getPropertyValue("margin-bottom"));
+		const border =
+			parseFloat(computedStyle.getPropertyValue("border-top")) +
+			parseFloat(computedStyle.getPropertyValue("border-bottom"));
+
+		return el.getBoundingClientRect().height + padding + margin + border;
+	}
 }
 
 class Popup extends CoreFeature{
@@ -1803,7 +1818,10 @@ class Cell extends CoreFeature{
 	}
 
 	getHeight(){
-		return this.height || this.element.offsetHeight;
+		return this.height ||
+			(this.table.options.outerRowHeight
+				? Helpers.elOuterHeight(this.element)
+				:	this.element.offsetHeight);
 	}
 
 	show(){
@@ -18663,7 +18681,7 @@ class SelectRow extends Module{
 	//toggle row selection
 	toggleRow(row){
 		if(this.checkRowSelectability(row)){
-			if (row.modules.select && row.modules.select.selected && !this.table.options.clickNoDeselect) {
+			if (row.modules.select && row.modules.select.selected && !this.table.options.clickNoDeselectRow) {
 				this._deselectRow(row);
 			}else {
 				this._selectRow(row);

@@ -44,4 +44,19 @@ export default class Helpers{
 
 		return clone;
 	}
+
+	static elOuterHeight(el){
+		const computedStyle = getComputedStyle(el);
+		const padding =
+			parseFloat(computedStyle.getPropertyValue("padding-top")) +
+			parseFloat(computedStyle.getPropertyValue("padding-bottom"));
+		const margin =
+			parseFloat(computedStyle.getPropertyValue("margin-top")) +
+			parseFloat(computedStyle.getPropertyValue("margin-bottom"));
+		const border =
+			parseFloat(computedStyle.getPropertyValue("border-top")) +
+			parseFloat(computedStyle.getPropertyValue("border-bottom"));
+
+		return el.getBoundingClientRect().height + padding + margin + border;
+	}
 }

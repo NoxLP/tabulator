@@ -382,6 +382,69 @@
 		"editableTitle": undefined,
 	};
 
+	class Helpers{
+
+		static elVisible(el){
+			return !(el.offsetWidth <= 0 && el.offsetHeight <= 0);
+		}
+
+		static elOffset(el){
+			var box = el.getBoundingClientRect();
+
+			return {
+				top: box.top + window.pageYOffset - document.documentElement.clientTop,
+				left: box.left + window.pageXOffset - document.documentElement.clientLeft
+			};
+		}
+
+		static deepClone(obj, clone, list = []){
+			var objectProto = {}.__proto__,
+			arrayProto = [].__proto__;
+
+			if (!clone){
+				clone = Object.assign(Array.isArray(obj) ? [] : {}, obj);
+			}
+
+			for(var i in obj) {
+				let subject = obj[i],
+				match, copy;
+
+				if(subject != null && typeof subject === "object" && (subject.__proto__ === objectProto || subject.__proto__ === arrayProto)){
+					match = list.findIndex((item) => {
+						return item.subject === subject;
+					});
+
+					if(match > -1){
+						clone[i] = list[match].copy;
+					}else {
+						copy = Object.assign(Array.isArray(subject) ? [] : {}, subject);
+
+						list.unshift({subject, copy});
+
+						clone[i] = this.deepClone(subject, copy, list);
+					}
+				}
+			}
+
+			return clone;
+		}
+
+		static elOuterHeight(el){
+			const computedStyle = getComputedStyle(el);
+			const padding =
+				parseFloat(computedStyle.getPropertyValue("padding-top")) +
+				parseFloat(computedStyle.getPropertyValue("padding-bottom"));
+			const margin =
+				parseFloat(computedStyle.getPropertyValue("margin-top")) +
+				parseFloat(computedStyle.getPropertyValue("margin-bottom"));
+			const border =
+				parseFloat(computedStyle.getPropertyValue("border-top")) +
+				parseFloat(computedStyle.getPropertyValue("border-bottom"));
+
+			return el.getBoundingClientRect().height + padding + margin + border;
+		}
+	}
+
 	//public cell object
 	class CellComponent {
 
@@ -717,7 +780,10 @@
 		}
 
 		getHeight(){
-			return this.height || this.element.offsetHeight;
+			return this.height ||
+				(this.table.options.outerRowHeight
+					? Helpers.elOuterHeight(this.element)
+					:	this.element.offsetHeight);
 		}
 
 		show(){
@@ -1696,54 +1762,6 @@
 	}
 
 	Column.defaultOptionList = defaultColumnOptions;
-
-	class Helpers{
-
-		static elVisible(el){
-			return !(el.offsetWidth <= 0 && el.offsetHeight <= 0);
-		}
-
-		static elOffset(el){
-			var box = el.getBoundingClientRect();
-
-			return {
-				top: box.top + window.pageYOffset - document.documentElement.clientTop,
-				left: box.left + window.pageXOffset - document.documentElement.clientLeft
-			};
-		}
-
-		static deepClone(obj, clone, list = []){
-			var objectProto = {}.__proto__,
-			arrayProto = [].__proto__;
-
-			if (!clone){
-				clone = Object.assign(Array.isArray(obj) ? [] : {}, obj);
-			}
-
-			for(var i in obj) {
-				let subject = obj[i],
-				match, copy;
-
-				if(subject != null && typeof subject === "object" && (subject.__proto__ === objectProto || subject.__proto__ === arrayProto)){
-					match = list.findIndex((item) => {
-						return item.subject === subject;
-					});
-
-					if(match > -1){
-						clone[i] = list[match].copy;
-					}else {
-						copy = Object.assign(Array.isArray(subject) ? [] : {}, subject);
-
-						list.unshift({subject, copy});
-
-						clone[i] = this.deepClone(subject, copy, list);
-					}
-				}
-			}
-
-			return clone;
-		}
-	}
 
 	class OptionsList {
 		constructor(table, msgType, defaults = {}){
@@ -24747,7 +24765,7 @@
 		//toggle row selection
 		toggleRow(row){
 			if(this.checkRowSelectability(row)){
-				if(row.modules.select && row.modules.select.selected){
+				if (row.modules.select && row.modules.select.selected && !this.table.options.clickNoDeselectRow) {
 					this._deselectRow(row);
 				}else {
 					this._selectRow(row);

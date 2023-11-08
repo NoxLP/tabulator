@@ -1,4 +1,5 @@
 import CoreFeature from '../CoreFeature.js';
+import Helpers from '../tools/Helpers.js';
 import CellComponent from './CellComponent.js';
 
 export default class Cell extends CoreFeature{
@@ -43,6 +44,7 @@ export default class Cell extends CoreFeature{
 		this.element = document.createElement('div');
 		this.element.className = "tabulator-cell";
 		this.element.setAttribute("role", "gridcell");
+		this.element.style.height = 'fit-content'
 	}
 
 	_configureCell(){
@@ -256,7 +258,10 @@ export default class Cell extends CoreFeature{
 	}
 
 	getHeight(){
-		return this.height || this.element.offsetHeight;
+		return this.height ||
+			(this.table.options.outerRowHeight
+				? Helpers.elOuterHeight(this.element)
+				:	this.element.offsetHeight);
 	}
 
 	show(){
